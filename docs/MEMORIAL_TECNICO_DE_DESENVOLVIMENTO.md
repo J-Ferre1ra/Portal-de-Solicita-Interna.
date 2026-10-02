@@ -1,54 +1,107 @@
 # Memorial Técnico de Desenvolvimento
 
-## Objetivo
+## 1. Objetivo
 
-O Portal de Solicitações Internas permite que colaboradores autenticados criem e acompanhem demandas, consultem seus detalhes e filtrem a listagem. A solução atende aos requisitos funcionais do PDF oficial da bit Soluções.
+O Portal de Solicitações Internas permite que uma pessoa autenticada registre uma demanda, acompanhe seu status e consulte solicitações. O projeto usa uma interface React, uma API Express e um banco SQLite local. Este memorial apresenta as decisões tomadas e um roteiro simples para entender o sistema.
 
-## Tecnologias utilizadas e justificativas
+## 2. Tecnologias utilizadas e justificativas
 
-| Tecnologia | Uso e motivo da escolha |
+| Tecnologia | Por que foi escolhida | Benefício neste projeto e comparação simples | Efeito na manutenção e produtividade |
+| --- | --- | --- | --- |
+| JavaScript e Node.js | A mesma linguagem pode ser usada no frontend e backend. | Evita trocar de linguagem entre interface e API. Usar linguagens diferentes também seria possível, mas exigiria aprender e manter duas sintaxes. | Compartilhar a linguagem deixa o projeto de estudo mais direto. |
+| React | O sistema tem formulários, listagens, indicadores e janelas de detalhes que mudam com as interações. | Componentes permitem separar as partes da interface e atualizá-las com estado. Uma página estática não atenderia esses fluxos. | A divisão em componentes ajuda a localizar cada tela e evita concentrar todo o JSX em `App.jsx`. |
+| Vite | É o servidor de desenvolvimento e gerador do build do frontend. | Inicia a interface com pouca configuração e oferece proxy local para `/api`. | Reduz os passos para iniciar e compilar a interface. |
+| Tailwind CSS | Estiliza os componentes com classes utilitárias. | Espaçamento, cores e responsividade ficam nos elementos, sem criar uma folha extensa para estas telas. | Mantém os estilos perto dos componentes e facilita ajustes visuais pequenos. |
+| Express | O sistema precisa de rotas HTTP para autenticação, solicitações e dashboard. | Oferece rotas e middleware de forma direta. Sem framework, seria necessário tratar manualmente mais detalhes de URLs e requisições. | Cada grupo de rotas está em um arquivo próprio, facilitando encontrar os endpoints. |
+| SQLite e `sqlite3` | O desafio precisa persistir dados e ser simples de executar localmente. | O banco é um arquivo; não é preciso configurar um servidor SQL separado. PostgreSQL é uma alternativa para aplicações com vários servidores, mas adicionaria configuração para esta entrega local. | O avaliador cria o banco com um comando e pode consultar o schema SQL junto ao código. |
+| `express-session` | A aplicação precisa de login, sessão e logout. | Mantém a sessão no servidor e relaciona o navegador a ela por um cookie. | O fluxo de autenticação fica apoiado em middleware e nas rotas específicas de login/logout. |
+| `bcryptjs` | A aplicação precisa conferir a senha de acesso. | Guarda no banco um hash, em vez do texto original da senha. | A comparação é feita pelas funções da biblioteca, sem implementar hash manualmente. |
+| `fetch` (API do navegador) | O frontend precisa enviar chamadas ao backend. | Já está disponível no navegador e atende às requisições JSON do projeto. | Evita instalar uma biblioteca HTTP adicional. |
+| npm e Git | npm administra pacotes e Git registra o código. | O lockfile ajuda a repetir a instalação das dependências; o histórico Git mostra as mudanças do projeto. | Os comandos conhecidos tornam a preparação do ambiente mais previsível. |
+
+O projeto não utiliza Docker, serviços de nuvem, biblioteca externa de validação ou ferramenta de testes automatizados. As dependências foram mantidas próximas às necessidades do desafio.
+
+## 3. Justificativa conceitual
+
+### 3.1 Estrutura geral e organização do código
+
+O repositório tem duas partes:
+
+- `backend/` contém o servidor Express, a conexão e o schema SQLite, o middleware de autenticação e as rotas da API.
+- `frontend/` contém a aplicação React, os componentes de interface, as opções de categoria/status e a função usada para chamar a API.
+
+No frontend, `App.jsx` mantém o estado compartilhado e coordena login, navegação, carregamento e ações sobre solicitações. Os componentes de tela ficam em `frontend/src/components/`: `Login`, `Dashboard`, `RequestsPage`, `RequestForm`, `RequestDetails` e `Modal`. Categorias e status estão em `frontend/src/constants/requestOptions.js`; as chamadas JSON estão em `frontend/src/services/api.js`.
+
+No backend, as rotas ficam em `backend/src/routes/`. O middleware `requireAuth` é aplicado às rotas que exigem uma sessão. A conexão SQLite fica em `backend/src/db/database.js`, e o schema executável fica em `backend/src/db/schema.sql`.
+
+Não foi adotado um padrão de projeto formal. A organização usa funções, componentes React, props e módulos ES/CommonJS, mecanismos básicos da stack. A separação em frontend, API, rotas e acesso ao banco é adequada ao tamanho deste projeto.
+
+### 3.2 Organização das camadas
+
+O navegador apresenta a interface e envia requisições JSON ao Express. O backend verifica autenticação, aplica as regras das solicitações e consulta o SQLite. O banco persiste usuários e solicitações. No desenvolvimento local, o Vite encaminha o prefixo `/api` para o backend, então o frontend pode usar caminhos relativos.
+
+### 3.3 Estratégia de modelagem de dados
+
+O banco possui duas tabelas:
+
+- `users` guarda o nome de usuário e o hash da senha.
+- `requests` guarda título, descrição, categoria, data de criação, status e identificador do solicitante.
+
+`requests.requester_id` referencia `users.id`. O banco define a data de criação e o status inicial `Aberto`. Restrições SQL limitam as categorias e os estados aceitos. O [dicionário de dados](dicionario-de-dados.md) descreve cada campo, e o script de criação está em `backend/src/db/schema.sql`.
+
+### 3.4 Estratégia de autenticação
+
+O usuário envia nome e senha pelo formulário de login. A API procura o usuário e compara a senha recebida com o hash bcrypt. Quando as credenciais são aceitas, `express-session` cria uma sessão e o navegador recebe um cookie `HttpOnly`. O logout encerra a sessão. O middleware `requireAuth` protege os endpoints de solicitações e dashboard.
+
+### 3.5 Comunicação entre frontend e backend
+
+O frontend usa a função `api()` de `frontend/src/services/api.js`, baseada no `fetch` nativo. As requisições e respostas usam JSON sob o caminho `/api`. Durante o desenvolvimento, o Vite encaminha essas chamadas ao Express na porta `3000`.
+
+Os endpoints estão agrupados por recurso: `/api/auth` trata login e sessão, `/api/requests` trata solicitações e `/api/dashboard` fornece os indicadores. A interface exibe mensagens de sucesso e erro retornadas durante as ações.
+
+## 4. Como executar e percorrer a aplicação
+
+O [README](../README.md) contém os pré-requisitos, a configuração, as instruções de instalação do banco/backend/frontend, os comandos para execução local e as credenciais de demonstração. Depois de iniciar os dois servidores e entrar no sistema, siga este roteiro:
+
+1. **Login:** entre com usuário `admin` e senha `Admin123!`.
+2. **Dashboard:** confira o total e a contagem por status. Use **Nova solicitação** para abrir o formulário diretamente desta tela.
+3. **Criar:** informe título, descrição e categoria; salvar cria a solicitação com status inicial `Aberto`.
+4. **Listar e filtrar:** abra **Solicitações** e use período, categoria, status e texto do título.
+5. **Detalhes:** selecione **Detalhes** em uma linha para consultar as informações completas.
+6. **Editar:** em uma solicitação aberta, selecione **Editar**, altere os campos e salve.
+7. **Alterar status:** escolha um estado no campo de status da linha. Os indicadores do dashboard são atualizados.
+8. **Excluir:** em uma solicitação aberta, selecione **Excluir** e confirme a ação.
+9. **Logout:** selecione **Sair** para encerrar a sessão.
+
+## 5. Análise crítica
+
+O sistema foi mantido dentro do fluxo pedido pelo desafio. Há algumas decisões simples que delimitam o uso atual:
+
+- **Sessão em memória:** a configuração atual usa o armazenamento padrão de sessão do Express. Reiniciar a API encerra as sessões ativas. Uma etapa futura para uso contínuo seria armazenar as sessões de forma persistente.
+- **Usuário de demonstração:** `npm run db:init` prepara a conta local `admin`. O projeto não possui cadastro de usuários, pois o fluxo apresentado no desafio começa pelo login.
+- **Execução local:** o README explica como iniciar a interface e a API localmente. Não há provedor de hospedagem em nuvem configurado nesta entrega.
+- **Testes automatizados:** o repositório não possui uma suíte automatizada. Uma melhoria possível seria adicionar testes dos fluxos de login e solicitações.
+
+O enunciado não detalha se existem tipos de usuário diferentes nem quem pode editar uma solicitação aberta. Para manter a regra simples, a implementação permite que qualquer pessoa autenticada gerencie solicitações abertas. Em uma versão corporativa, eu confirmaria essa regra com a equipe antes de adicionar permissões. Também configuraria armazenamento persistente para sessões e credenciais próprias para cada ambiente.
+
+Esses pontos são possibilidades de evolução, não funcionalidades necessárias para demonstrar o fluxo atual. Para um ambiente corporativo, armazenamento de sessão e hospedagem seriam definidos com a equipe responsável antes de ampliar o sistema.
+
+## 6. Evidências da aplicação
+
+O desafio considera prints ou vídeo como evidências opcionais. Para que cada captura seja compreensível sem explicação ao vivo, use legendas como estas:
+
+| Tela a capturar | Legenda sugerida |
 | --- | --- |
-| JavaScript e Node.js | Usados no backend e no frontend. Uma linguagem comum nas duas partes reduz o número de conceitos diferentes necessários para manter o projeto. |
-| React | Organiza a interface em componentes pequenos e reutilizáveis, como login, filtros, formulário e dashboard. Foi escolhido para construir a interface solicitada sem introduzir uma arquitetura complexa. |
-| Vite | Inicia o ambiente de desenvolvimento e gera a compilação do frontend com configuração reduzida. O proxy local também encaminha `/api` ao Express. |
-| Tailwind CSS | Aplica estilos utilitários diretamente nos componentes, mantendo o CSS simples e as telas consistentes. |
-| Express | Fornece rotas HTTP e middleware para JSON, sessão e autenticação, com pouca configuração. |
-| SQLite e `sqlite3` | Guardam os dados em um arquivo local, sem exigir um servidor de banco separado. Isso facilita a execução pelo avaliador; PostgreSQL seria mais adequado para vários servidores ou maior carga. |
-| `bcryptjs` | Gera e compara hashes de senha. Assim, o banco não precisa armazenar senhas em texto puro. |
-| `express-session` | Mantém a identidade autenticada numa sessão de servidor associada a um cookie `HttpOnly`. A sessão pode ser invalidada no logout; esse fluxo se ajusta diretamente aos requisitos de login, controle de sessão e logout. |
-| npm e Git | npm instala e registra as dependências; Git mantém o histórico incremental do projeto. |
+| Login | **Login — informe o usuário e a senha de demonstração para acessar o portal.** |
+| Dashboard | **Dashboard — confira os totais por status e use “Nova solicitação” para abrir o formulário nesta tela.** |
+| Formulário | **Nova solicitação — preencha título, descrição e categoria, depois selecione “Salvar”.** |
+| Listagem e filtros | **Solicitações — combine período, categoria, status e título para filtrar a lista.** |
+| Detalhes | **Detalhes — abra uma solicitação para conferir os dados completos.** |
+| Edição | **Editar — altere uma solicitação enquanto ela estiver com status “Aberto”.** |
+| Status | **Status — atualize a situação para “Em Atendimento” ou “Concluído” e confira o dashboard.** |
+| Exclusão | **Excluir — confirme a exclusão de uma solicitação que ainda está aberta.** |
+| Logout | **Sair — encerre a sessão pelo botão no menu superior.** |
 
-## Arquitetura e organização
+Para um vídeo curto e completo, grave nessa ordem: login; dashboard e criação pelo dashboard; listagem e filtros; detalhes e edição; alteração de status; criação de outra solicitação pela listagem e exclusão enquanto aberta; retorno ao dashboard; logout. Essa sequência mostra os fluxos principais sem precisar narrar detalhes de implementação.
 
-O projeto tem duas partes locais:
-
-- `frontend/`: React apresenta as telas e usa `fetch` para consumir a API.
-- `backend/`: Express valida dados, aplica regras de negócio e consulta o SQLite.
-
-O navegador acessa o frontend Vite. O proxy encaminha chamadas em `/api` para o Express, então a aplicação não precisa de uma biblioteca HTTP adicional nem de configuração de CORS para desenvolvimento local. As rotas ficam separadas por responsabilidade em `backend/src/routes/`; `requireAuth` bloqueia as rotas de dados quando não há sessão ativa.
-
-## Modelo de dados
-
-O banco contém duas tabelas principais. `users` guarda o usuário de login e o hash da senha. `requests` guarda título, descrição, categoria, data, status e `requester_id`, que referencia o usuário que abriu a solicitação.
-
-O SQL define `Aberto` e a data de criação como valores automáticos. Restrições `CHECK` aceitam apenas os status e categorias previstos. A API também valida os campos para devolver mensagens compreensíveis antes de o SQLite rejeitar valores inválidos. O dicionário completo está em `docs/dicionario-de-dados.md`.
-
-## Autenticação e regras de negócio
-
-O login consulta o nome de usuário e compara a senha fornecida ao hash bcrypt. Se as credenciais forem válidas, uma sessão é criada e identificada por cookie `HttpOnly`. O logout destrói a sessão e limpa o cookie. A sessão tem validade de oito horas e todas as rotas de solicitações e dashboard exigem autenticação.
-
-Ao criar uma solicitação, o backend usa o usuário da sessão, deixando a data e o status inicial a cargo do banco. Edição e exclusão só são permitidas quando o status é `Aberto`. A alteração de status aceita `Aberto`, `Em Atendimento` e `Concluído`. A listagem pode ser filtrada por datas, categoria, status e texto do título. O dashboard conta total, abertas, em atendimento e concluídas.
-
-O enunciado não define papéis diferentes nem limita edição ao solicitante original. Portanto, não foi adicionada essa regra de autorização. Todos os usuários autenticados podem acessar e gerenciar as solicitações, e o sistema registra quem abriu cada uma.
-
-## Comunicação e validação
-
-O frontend envia e recebe JSON por rotas REST sob `/api`. Erros de validação retornam HTTP 400; sessão ausente retorna 401; registro inexistente retorna 404; tentativa de editar ou excluir uma solicitação que não está aberta retorna 409. Os parâmetros SQL usam placeholders para não concatenar entradas do usuário em comandos.
-
-## Limitações e melhorias possíveis
-
-- As sessões usam o armazenamento em memória padrão do Express. É adequado à demonstração em uma instância local, mas reiniciar o servidor encerra as sessões e múltiplas instâncias exigiriam um armazenamento compartilhado.
-- O segredo de sessão precisa ser definido no ambiente em uso; o valor padrão do código serve apenas para desenvolvimento local. Em produção, deve ser secreto e o cookie deve ser servido por HTTPS.
-- O usuário `admin` de demonstração é criado por `npm run db:init` com a senha mostrada no README. O seed é para avaliação local; antes de uso real, as credenciais devem ser substituídas.
-- O projeto não inclui cadastro de usuários, papéis de acesso, paginação ou regras de transição entre status porque o enunciado não exige esses fluxos.
-- Para uso corporativo, recomenda-se armazenamento persistente de sessão, política operacional para criação e troca de credenciais, HTTPS, backup do SQLite e uma estratégia de migração se o volume de acessos crescer.
+Quando as capturas forem feitas, salve-as em `docs/evidencias/` e inclua-as nesta seção com as legendas correspondentes. O vídeo pode ser guardado junto à pasta de evidências ou anexado separadamente ao envio do repositório.
