@@ -88,20 +88,45 @@ Esses pontos são possibilidades de evolução, não funcionalidades necessária
 
 ## 6. Evidências da aplicação
 
-O desafio considera prints ou vídeo como evidências opcionais. Para que cada captura seja compreensível sem explicação ao vivo, use legendas como estas:
+O desafio considera prints ou vídeo como evidências opcionais. Para que cada captura seja compreensível sem explicação ao vivo, use legendas como estas:<br><br>
 
-| Tela a capturar | Legenda sugerida |
-| --- | --- |
-| Login | **Login — informe o usuário e a senha de demonstração para acessar o portal.** |
-| Dashboard | **Dashboard — confira os totais por status e use “Nova solicitação” para abrir o formulário nesta tela.** |
-| Formulário | **Nova solicitação — preencha título, descrição e categoria, depois selecione “Salvar”.** |
-| Listagem e filtros | **Solicitações — combine período, categoria, status e título para filtrar a lista.** |
-| Detalhes | **Detalhes — abra uma solicitação para conferir os dados completos.** |
-| Edição | **Editar — altere uma solicitação enquanto ela estiver com status “Aberto”.** |
-| Status | **Status — atualize a situação para “Em Atendimento” ou “Concluído” e confira o dashboard.** |
-| Exclusão | **Excluir — confirme a exclusão de uma solicitação que ainda está aberta.** |
-| Logout | **Sair — encerre a sessão pelo botão no menu superior.** |
 
-Para um vídeo curto e completo, grave nessa ordem: login; dashboard e criação pelo dashboard; listagem e filtros; detalhes e edição; alteração de status; criação de outra solicitação pela listagem e exclusão enquanto aberta; retorno ao dashboard; logout. Essa sequência mostra os fluxos principais sem precisar narrar detalhes de implementação.
+<img width="1732" height="732" alt="image" src="https://github.com/user-attachments/assets/47bbadbe-c928-4e1e-936a-fa8e2657eaf6" />
+- Login: Informe o usuário e a senha de demonstração para acessar o portal.
+<br><br>
 
-Quando as capturas forem feitas, salve-as em `docs/evidencias/` e inclua-as nesta seção com as legendas correspondentes. O vídeo pode ser guardado junto à pasta de evidências ou anexado separadamente ao envio do repositório.
+<img width="1817" height="747" alt="image" src="https://github.com/user-attachments/assets/36d7a52a-d319-4b1a-81de-1f4b03558302" />
+- Dashboard: Confira os totais por status e use “Nova solicitação” para abrir o formulário nesta tela.
+<br><br>
+
+<img width="742" height="565" alt="image" src="https://github.com/user-attachments/assets/37622eac-45e1-436b-ac9b-5399763db700" />
+<br>
+- Nova solicitação: Preencha título, descrição e categoria, depois selecione “Salvar”.
+<br><br>
+
+<img width="1622" height="707" alt="image" src="https://github.com/user-attachments/assets/1a21f2a7-2a5c-440e-aeed-ea1a382f33d4" />
+<br>
+- Solicitações: Combine período, categoria, status e título para filtrar a lista.
+<br><br>
+
+<img width="896" height="617" alt="image" src="https://github.com/user-attachments/assets/3c585a6e-3b0d-4718-9ca7-7cccd78e5a75" />
+<br>
+- Detalhes: Abra uma solicitação para conferir os dados completos.
+<br><br>
+
+<img width="790" height="616" alt="image" src="https://github.com/user-attachments/assets/15ce54b9-756f-41bd-a549-8062d812a38f" />
+<br>
+- Editar: Altere uma solicitação enquanto ela estiver com status “Aberto”.
+<br><br>
+
+<img width="1562" height="222" alt="image" src="https://github.com/user-attachments/assets/4f97649d-cfce-45aa-b263-27c1044b1923" />
+<img width="1631" height="462" alt="image" src="https://github.com/user-attachments/assets/fb27e0ec-1787-4d22-af5f-767796a5f7ae" />
+- Status: Atualize a situação para “Em Atendimento” ou “Concluído” e confira o dashboard.
+<br><br>
+
+<img width="1590" height="465" alt="image" src="https://github.com/user-attachments/assets/ddb36b93-a1a1-4fa0-bcc4-328f567f1bca" />
+- Excluir: Confirme a exclusão de uma solicitação que ainda está aberta.
+<br><br>
+
+<img width="1652" height="87" alt="image" src="https://github.com/user-attachments/assets/239f0d24-8c42-4dca-a861-d438f04127a7" />
+- Sair: Encerre a sessão pelo botão no menu superior.
