@@ -1,7 +1,6 @@
 # Portal de Solicitações Internas
 
-Aplicação full stack para que colaboradores autenticados registrem solicitações internas e acompanhem seu andamento. O projeto foi desenvolvido para a etapa técnica de Desenvolvedor(a) de Sistemas Júnior da bit Soluções.
-
+Aplicação full stack para que colaboradores autenticados registrem solicitações internas e acompanhem seu andamento.
 ## O que o sistema faz
 
 - Autentica o usuário e mantém uma sessão até o logout ou o encerramento da API.
